@@ -1,29 +1,31 @@
 package main
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	"log"
 )
 
-var name string
+type Name string
+
+func (this *Name) String() string {
+	return fmt.Sprint(*this)
+}
+
+func (this *Name) Set(value string) error {
+	if len(*this) > 0 {
+		return errors.New("name flag already set")
+
+	}
+	*this = Name("catman: " + value)
+	return nil
+}
 
 func main() {
+	var name Name
+	flag.Var(&name, "name", "帮助信息")
 	flag.Parse()
-
-	args := flag.Args()
-	if len(args) <= 0 {
-		return
-	}
-	log.Printf("args: %v", args)
-	switch args[0] {
-	case "go":
-		goCmd := flag.NewFlagSet("go", flag.ExitOnError)
-		goCmd.StringVar(&name, "name", "GO 语言", "帮助信息")
-		_ = goCmd.Parse(args[1:])
-	case "python":
-		pyCmd := flag.NewFlagSet("python", flag.ExitOnError)
-		pyCmd.StringVar(&name, "n", "python 语言", "帮助信息")
-		_ = pyCmd.Parse(args[1:])
-	}
 	log.Printf("name: %s", name)
+
 }
